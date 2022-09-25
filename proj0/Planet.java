@@ -5,7 +5,7 @@ public class Planet {
     public double yyVel;
     public double mass;
     public String imgFileName;
-    public static double G = 6.67E-11;
+    private static double G = 6.67E-11;
 
     public Planet(double xP, double yP, double xV,
             double yV, double m, String img) {
@@ -78,19 +78,7 @@ public class Planet {
         this.yyPos += dt*this.yyVel;
     }
 
-    public void draw(double radius) {
-        StdDraw.picture(this.xxPos/radius, this.yyPos/radius, "./images/" + imgFileName);
-    }
-
-    @Override
-    public String toString() {
-        return "Planet{" +
-                "xxPos=" + xxPos +
-                ", yyPos=" + yyPos +
-                ", xxVel=" + xxVel +
-                ", yyVel=" + yyVel +
-                ", mass=" + mass +
-                ", imgFileName='" + imgFileName + '\'' +
-                '}';
+    public void draw() {
+        StdDraw.picture(this.xxPos, this.yyPos, "./images/" + imgFileName);
     }
 }

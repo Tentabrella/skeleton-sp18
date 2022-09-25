@@ -33,7 +33,7 @@ public class NBody {
         return planets;
     }
 
-    public static Planet parsePlanet(String s) {
+    private static Planet parsePlanet(String s) {
         String[] d = s.trim().split("\\s+");
         Planet planet = new Planet(Double.parseDouble(d[0]), 
             Double.parseDouble(d[1]), 
@@ -55,8 +55,8 @@ public class NBody {
         Planet[] planets = readPlanets(filename);
        
         //init canvas
-        StdDraw.setXscale(-1.0, 1.0);
-        StdDraw.setYscale(-1.0, 1.0);
+        StdDraw.setXscale(-radius, radius);
+        StdDraw.setYscale(-radius, radius);
         StdDraw.enableDoubleBuffering();
         
         //init fX and fY array
@@ -76,7 +76,7 @@ public class NBody {
             for (int i = 0; i < n; i++) {
                 Planet planet = planets[i];
                 planet.update(dt, fXs[i], fYs[i]);
-                planet.draw(radius);
+                planet.draw();
             }
             StdDraw.show();
             T -= dt;
