@@ -50,7 +50,7 @@ public class LinkedListDeque<T> {
     public void printDeque() {
         ListNode node = this.sentinel.next;
         while (node != sentinel) {
-            System.out.printf(node.value+" ");
+            System.out.print(node.value+" ");
             node = node.next;
         }
     }
@@ -81,5 +81,19 @@ public class LinkedListDeque<T> {
             index--;
         }
         return (T) node.value;
+    }
+
+    public T getRecursive(int index) {
+        if (index < 0 || index >= size) {
+            return null;
+        }
+        return (T) getRecursive(index, this.sentinel);
+    }
+
+    public T getRecursive(int index, ListNode<T> node) {
+        if (index < 0) {
+            return node.value;
+        }
+        return getRecursive(index--, node.next);
     }
 }
