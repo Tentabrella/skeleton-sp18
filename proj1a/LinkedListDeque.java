@@ -1,5 +1,3 @@
-import java.util.List;
-
 public class LinkedListDeque<T> {
     private ListNode sentinel;
     private int size;
@@ -50,7 +48,7 @@ public class LinkedListDeque<T> {
     public void printDeque() {
         ListNode node = this.sentinel.next;
         while (node != sentinel) {
-            System.out.print(node.value+" ");
+            System.out.print(node.value + " ");
             node = node.next;
         }
     }
@@ -90,7 +88,7 @@ public class LinkedListDeque<T> {
         return (T) getRecursive(index, this.sentinel);
     }
 
-    public T getRecursive(int index, ListNode<T> node) {
+    private T getRecursive(int index, ListNode<T> node) {
         if (index < 0) {
             return node.value;
         }

@@ -41,7 +41,7 @@ public class ArrayDeque<T> {
     /** Insert the X into the front of the list*/
     public void addFirst(T x) {
         if (this.size == this.arrSize) {
-            resize(this.arrSize* 2);
+            resize(this.arrSize * 2);
         }
         ts[minusOne(head)] = x;
         head = minusOne(head);
@@ -51,7 +51,7 @@ public class ArrayDeque<T> {
     /** Inserts X into the back of the list. */
     public void addLast(T x) {
         if (this.size == this.arrSize) {
-            resize(this.arrSize* 2);
+            resize(this.arrSize * 2);
         }
         ts[tail] = x;
         tail = plusOne(tail);
