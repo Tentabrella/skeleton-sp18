@@ -1,18 +1,20 @@
-public class ArrayDeque<T> implements Deque<T>{
+public class ArrayDeque<T> implements Deque<T> {
     private int head;
     private int tail;
     private T[] ts;
     private int arrSize;
     private int size;
+    private final int INIT_SIZE = 8;
+    private final int MIN_SHRINK_SIZE = 8;
 
     /** Creates an empty list. */
     public ArrayDeque() {
         this.head = 0;
         this.tail = 0;
-        this.arrSize = 8;
+        this.arrSize = INIT_SIZE;
         this.size = 0;
         //noinspection unchecked
-        this.ts = (T[]) new Object[8];
+        this.ts = (T[]) new Object[INIT_SIZE];
     }
 
     /** Resizes the underlying array to the target capacity.
@@ -83,7 +85,7 @@ public class ArrayDeque<T> implements Deque<T>{
     /** Remove the head element of the list and return it*/
     @Override
     public T removeFirst() {
-        if (arrSize >= 16 && (size << 2) < arrSize) {
+        if (arrSize >= MIN_SHRINK_SIZE && (size << 2) < arrSize) {
             resize(arrSize / 2);
         }
         if (isEmpty()) {
@@ -99,7 +101,7 @@ public class ArrayDeque<T> implements Deque<T>{
     /** Remove the head element of the list and return it*/
     @Override
     public T removeLast() {
-        if (arrSize >= 16 && (size << 2) < arrSize) {
+        if (arrSize >= MIN_SHRINK_SIZE && (size << 2) < arrSize) {
             resize(arrSize / 2);
         }
         if (isEmpty()) {
