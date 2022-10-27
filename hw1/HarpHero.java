@@ -1,7 +1,6 @@
-package synthesizer;
-
 import edu.princeton.cs.algs4.StdAudio;
 import edu.princeton.cs.algs4.StdDraw;
+import synthesizer.HarpString;
 
 import java.util.Arrays;
 

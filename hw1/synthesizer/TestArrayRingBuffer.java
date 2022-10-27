@@ -42,22 +42,6 @@ public class TestArrayRingBuffer {
     }
 
     @Test
-    public void TestIsFullIsEmpty() {
-        ArrayRingBuffer<String> arb = new ArrayRingBuffer<>(10);
-        for (int i = 0; i < 10; i++) {
-            arb.enqueue("hello" + i);
-        }
-        assertTrue(arb.isFull());
-        for (int i = 0; i < 10; i++) {
-            arb.dequeue();
-        }
-        assertTrue(arb.isEmpty());
-        arb.enqueue("hello");
-        assertFalse(arb.isEmpty());
-        assertFalse(arb.isFull());
-    }
-
-    @Test
     public void TestIntegrate() {
         ArrayRingBuffer<String> arb = new ArrayRingBuffer<>(10);
         for (int i = 0; i < 10; i++) {
