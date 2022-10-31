@@ -74,9 +74,7 @@ public class Game implements Serializable {
         input = input.toLowerCase();
         int separator = input.indexOf("s");
         int seed = input.substring(1, separator).hashCode();
-        System.out.println(seed);
         String command = input.substring(separator + 1);
-        System.out.println(command);
         random = new Random(seed);
         do {
             world = renderDungeon(canvasGenerator, random);
