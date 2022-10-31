@@ -72,17 +72,42 @@ public class Game implements Serializable {
         // drawn if the same inputs had been given to playWithKeyboard().
 
         input = input.toLowerCase();
-        int separator = input.indexOf("s");
-        int seed = input.substring(1, separator).hashCode();
-        String command = input.substring(separator + 1);
-        random = new Random(seed);
-        do {
-            world = renderDungeon(canvasGenerator, random);
-            character = initCharacter(random);
-            initDownStair(random);
-            command = clearFloorWithoutUI(command);
-            isFloorClear = false;
-        } while (!isGameClear && (command.length() != 0));
+        String command = "";
+        Boolean freshStart = true;
+        if ((input.charAt(0)+"").toLowerCase().equals("n")) {
+            int separator = input.indexOf("s");
+            int seed = input.substring(1, separator).hashCode();
+            command = input.substring(separator + 1);
+            random = new Random(seed);
+        } else if ((input.charAt(0)+"").toLowerCase().equals("l")) {
+            command = input.substring(1);
+            try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("./save.txt"))) {
+                SaveData saveData = (SaveData) inputStream.readObject();
+                reloadGame(saveData);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            freshStart = false;
+        }
+        if (!freshStart) {
+            do {
+                command = clearFloorWithoutUI(command);
+                isFloorClear = false;
+                if (command.length() != 0) {
+                    world = renderDungeon(canvasGenerator, random);
+                    character = initCharacter(random);
+                    initDownStair(random);
+                }
+            } while (!isGameClear && (command.length() != 0));
+        } else {
+            do {
+                world = renderDungeon(canvasGenerator, random);
+                character = initCharacter(random);
+                initDownStair(random);
+                command = clearFloorWithoutUI(command);
+                isFloorClear = false;
+            } while (!isGameClear && (command.length() != 0));
+        }
         return world;
     }
 
@@ -160,15 +185,16 @@ public class Game implements Serializable {
                 break;
             case "q":
                 if (quitMode) {
-                    try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("./save"))) {
+                    try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("./save.txt"))) {
                         SaveData saveData = new SaveData(this.random, this.level, this.world, this.character);
                         outputStream.writeObject(saveData);
                     } catch (Exception e) {
                         System.out.println(e);
                     }
+                    return true;
                 }
                 quitMode = false;
-                return true;
+                return false;
             case ":":
                 quitMode = true;
                 break;
@@ -271,7 +297,7 @@ public class Game implements Serializable {
                     random = new Random(seed.substring(0, seed.length() - 1).hashCode());
                     return true;
                 case "l":
-                    try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("./save"))) {
+                    try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("./save.txt"))) {
                         SaveData saveData = (SaveData) inputStream.readObject();
                         reloadGame(saveData);
                         return false;
