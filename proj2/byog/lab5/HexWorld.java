@@ -24,8 +24,8 @@ public class HexWorld {
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
         TETile[][] world = hexWorld.initWorld();
-        Hexgon hexgon1 = new Hexgon(new Position(41, 42), 4, Tileset.FLOWER);
-        hexWorld.addHexagon(world, hexgon1);
+        Hexgon hexgon = new Hexgon(new Position(41, 42), 4, Tileset.FLOWER);
+        hexWorld.addHexagon(world, hexgon);
         ter.renderFrame(world);
     }
 
