@@ -89,7 +89,9 @@ public class Game implements Serializable {
     private void clearFloor() {
         while (!isFloorClear) {
             String s = solicitNCharsInput(1);
-            moveCharacter(s);
+            if (moveCharacter(s)) {
+                System.exit(0);
+            }
             ter.renderFrame(world);
             showHelperBar();
             isFloorClear = checkDownStair();
@@ -100,7 +102,9 @@ public class Game implements Serializable {
         int index = 0;
         while (!isFloorClear && (index < command.length())) {
             String s = command.substring(index, index + 1);
-            moveCharacter(s);
+            if (moveCharacter(s)) {
+                return "";
+            }
             isFloorClear = checkDownStair();
             index++;
         }
@@ -130,7 +134,12 @@ public class Game implements Serializable {
         return false;
     }
 
-    private void moveCharacter(String s) {
+    /**
+     * move character, return true if what to quit
+     * @param s user input command
+     * @return return true if encounter the quit command
+     */
+    private boolean moveCharacter(String s) {
         Position lastPosition = character;
         switch (s) {
             case "w":
@@ -157,9 +166,9 @@ public class Game implements Serializable {
                     } catch (Exception e) {
                         System.out.println(e);
                     }
-                    System.exit(0);
                 }
                 quitMode = false;
+                return true;
             case ":":
                 quitMode = true;
                 break;
@@ -173,7 +182,7 @@ public class Game implements Serializable {
             lastTile = world[character.getX()][character.getY()];
             world[character.getX()][character.getY()] = Tileset.PLAYER;
         }
-        return;
+        return false;
     }
 
     private boolean checkWall() {
@@ -272,6 +281,7 @@ public class Game implements Serializable {
                     break;
                 case "q":
                     System.exit(0);
+                    break;
                 default:
                     StdDraw.setPenColor(Color.black);
                     StdDraw.filledRectangle(WIDTH / 2, HEIGHT / 2 - 8, 40, 2);
