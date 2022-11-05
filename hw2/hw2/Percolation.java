@@ -1,7 +1,6 @@
 package hw2;
 
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
-import org.junit.Assert;
 
 public class Percolation {
     private final int N;
@@ -109,5 +108,9 @@ public class Percolation {
             return isFull(0, 0);
         }
         return quickUnionUF.connected(virtualTail, virtualHead);
+    }
+
+    public static void main(String[] args) {
+
     }
 }
