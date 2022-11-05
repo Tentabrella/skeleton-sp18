@@ -70,15 +70,4 @@ public class PercolationStats {
     public double confidenceHigh() {
         return mean() + 1.96 * stddev() / Math.sqrt(T);
     }
-
-    public static void main(String[] args) {
-        int[] ns = new int[]{10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
-        for (int n : ns) {
-            Stopwatch stopwatch = new Stopwatch();
-            PercolationStats ps = new PercolationStats(n, 100, new PercolationFactory());
-            double time = stopwatch.elapsedTime() * 1000;
-            System.out.printf("with N = %d run time is %f ms\n", n, time);
-            System.out.printf("range between %f and %f\n", ps.confidenceLow(), ps.confidenceHigh());
-        }
-    }
 }

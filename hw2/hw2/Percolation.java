@@ -105,23 +105,9 @@ public class Percolation {
      * @return
      */
     public boolean percolates() {
+        if (N == 1) {
+            return isFull(0, 0);
+        }
         return quickUnionUF.connected(virtualTail, virtualHead);
-    }
-
-    /***
-     * use for unit testing (not required)
-     * @param args
-     */
-    public static void main(String[] args) {
-        Percolation small = new Percolation(2);
-        Assert.assertFalse(small.percolates());
-        small.open(0, 0);
-        Assert.assertFalse(small.percolates());
-        small.open(0, 1);
-        Assert.assertEquals(2, small.numberOfOpenSites());
-        Assert.assertFalse(small.percolates());
-        small.open(1, 1);
-        Assert.assertTrue(small.percolates());
-        System.out.println("test pass");
     }
 }
