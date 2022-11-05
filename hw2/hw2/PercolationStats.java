@@ -17,6 +17,9 @@ public class PercolationStats {
      * @param pf
      */
     public PercolationStats(int N, int T, PercolationFactory pf) {
+        if (N <= 0 || T <= 0) {
+            throw new IllegalArgumentException("N or T is oob");
+        }
         this.N = N;
         this.T = T;
         factory = pf;

@@ -20,12 +20,15 @@ public class Percolation {
      */
     public Percolation(int N) {
         if (N <= 0) {
-            throw new IllegalArgumentException("the length of grid is " + N + " but is expected to be positive");
+            throw new IllegalArgumentException("the length is below zero");
         }
         grid = new int[N][N];
         this.N = N;
         quickUnionUF = new WeightedQuickUnionUF(N * N);
         fullParent = new HashSet<>();
+        for (int i = 0; i < N; i++) {
+            fullParent.add(i);
+        }
     }
 
     /***
@@ -38,18 +41,20 @@ public class Percolation {
             return;
         }
         grid[row][col] = 1;
+        boolean isFull = row == 0;
         for (int i = 0; i < 4; i++) {
             int row2 = row + directions[i];
             int col2 = col + directions[i + 1];
             if (boundCheck(row2) && boundCheck(col2) && isOpen(row2, col2)) {
                 quickUnionUF.union(simpEncode(row, col), simpEncode(row2, col2));
+                if (!isFull && isFull(row2, col2)) {
+                    isFull = true;
+                }
             }
         }
         int parent = quickUnionUF.find(simpEncode(row, col));
-        for (int i = 0; i < N; i++) {
-            if (grid[0][i] == 1 && parent == quickUnionUF.find(simpEncode(0, i))) {
-                fullParent.add(parent);
-            }
+        if (isFull) {
+            fullParent.add(parent);
         }
         openSites++;
     }
@@ -130,9 +135,5 @@ public class Percolation {
         small.open(1, 1);
         Assert.assertTrue(small.percolates());
         System.out.println("test pass");
-    }
-
-    public int[][] getGrid() {
-        return grid;
     }
 }
