@@ -3,16 +3,15 @@ package hw2;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 import org.junit.Assert;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class Percolation {
     private final int N;
     private int[][] grid;
     private WeightedQuickUnionUF quickUnionUF;
+    private WeightedQuickUnionUF realQuickUnionUF;
     private int openSites = 0;
     private int[] directions = new int[]{-1, 0, 1, 0, -1};
-    private Set<Integer> fullParent;
+    private final int virtualHead;
+    private final int virtualTail;
 
     /***
      * create N-by-N grid, with all sites initially blocked
@@ -24,10 +23,14 @@ public class Percolation {
         }
         grid = new int[N][N];
         this.N = N;
-        quickUnionUF = new WeightedQuickUnionUF(N * N);
-        fullParent = new HashSet<>();
+        quickUnionUF = new WeightedQuickUnionUF(N * N + 2);
+        realQuickUnionUF = new WeightedQuickUnionUF(N * N + 1);
+        virtualHead = N * N;
+        virtualTail = N * N + 1;
         for (int i = 0; i < N; i++) {
-            fullParent.add(i);
+            quickUnionUF.union(simpEncode(0, i), virtualHead);
+            realQuickUnionUF.union(simpEncode(0, i), virtualHead);
+            quickUnionUF.union(simpEncode(N - 1, i), virtualTail);
         }
     }
 
@@ -41,20 +44,13 @@ public class Percolation {
             return;
         }
         grid[row][col] = 1;
-        boolean isFull = row == 0;
         for (int i = 0; i < 4; i++) {
             int row2 = row + directions[i];
             int col2 = col + directions[i + 1];
             if (boundCheck(row2) && boundCheck(col2) && isOpen(row2, col2)) {
                 quickUnionUF.union(simpEncode(row, col), simpEncode(row2, col2));
-                if (!isFull && isFull(row2, col2)) {
-                    isFull = true;
-                }
+                realQuickUnionUF.union(simpEncode(row, col), simpEncode(row2, col2));
             }
-        }
-        int parent = quickUnionUF.find(simpEncode(row, col));
-        if (isFull) {
-            fullParent.add(parent);
         }
         openSites++;
     }
@@ -93,10 +89,7 @@ public class Percolation {
      * @return
      */
     public boolean isFull(int row, int col) {
-        if (grid[row][col] == 1) {
-            return fullParent.contains(quickUnionUF.find(simpEncode(row, col)));
-        }
-        return false;
+        return grid[row][col] == 1 && realQuickUnionUF.connected(simpEncode(row, col), virtualHead);
     }
 
     /***
@@ -112,12 +105,7 @@ public class Percolation {
      * @return
      */
     public boolean percolates() {
-        for (int i = 0; i < N; i++) {
-            if (isFull(N - 1, i)) {
-                return true;
-            }
-        }
-        return false;
+        return quickUnionUF.connected(virtualTail, virtualHead);
     }
 
     /***
