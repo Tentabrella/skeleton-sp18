@@ -10,8 +10,8 @@ public class OomageTestUtility {
             int i = (o.hashCode() & 0x7FFFFFFF) % M;
             buckets[i]++;
         }
-        int lowBound = (int) Math.ceil(N/50);
-        int highBound = (int) ( N/2.5);
+        int lowBound = (int) Math.ceil(N / 50);
+        int highBound = (int) (N / 2.5);
         for (int bucket : buckets) {
             if (bucket < lowBound || bucket > highBound) {
                 return false;

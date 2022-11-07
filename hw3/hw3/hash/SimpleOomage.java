@@ -14,9 +14,15 @@ public class SimpleOomage implements Oomage {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) return true;
-        if (o == null) return false;
-        if (o.getClass() != this.getClass()) return false;
+        if (o == this) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        if (o.getClass() != this.getClass()) {
+            return false;
+        }
         SimpleOomage simpleOomage = (SimpleOomage) o;
         return simpleOomage.red == red && simpleOomage.green == green && blue == simpleOomage.blue;
     }
@@ -26,7 +32,7 @@ public class SimpleOomage implements Oomage {
         if (!USE_PERFECT_HASH) {
             return red + green + blue;
         } else {
-            return (red/5 * 59) + (green/5 * 59) + blue/5;
+            return (red / 5 * 359) + (green / 5 * 59) + blue / 5;
         }
     }
 
