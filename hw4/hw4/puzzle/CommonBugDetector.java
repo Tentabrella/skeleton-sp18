@@ -32,13 +32,13 @@ public class CommonBugDetector {
         @Override
         public Iterable<WorldState> neighbors() {
             switch (name) {
-                case('s'): return createWorldStateList(List.of('a', 'x'));
-                case('a'): return createWorldStateList(List.of('b'));
-                case('b'): return createWorldStateList(List.of('c'));
-                case('c'): return createWorldStateList(List.of('d'));
-                case('d'): return createWorldStateList(List.of('e'));
-                case('e'): return createWorldStateList(List.of('g'));
-                case('x'): return createWorldStateList(List.of('c'));
+                case ('s'): return createWorldStateList(List.of('a', 'x'));
+                case ('a'): return createWorldStateList(List.of('b'));
+                case ('b'): return createWorldStateList(List.of('c'));
+                case ('c'): return createWorldStateList(List.of('d'));
+                case ('d'): return createWorldStateList(List.of('e'));
+                case ('e'): return createWorldStateList(List.of('g'));
+                case ('x'): return createWorldStateList(List.of('c'));
                 default: return null;
             }
         }
