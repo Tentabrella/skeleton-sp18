@@ -120,10 +120,13 @@ public class Board implements WorldState {
      */
     public int manhattan() {
         int mdiff = 0;
-        for (int i = 0; i < size * size - 1; i++) {
+        for (int i = 0; i < size * size; i++) {
             int[] actPos = pos(i);
-            int[] expPos = expectPos(tileAt(actPos[0], actPos[1]));
-            mdiff += Math.abs(expPos[0] - actPos[0]) + Math.abs(expPos[1] - actPos[1]);
+            int num = tileAt(actPos[0], actPos[1]);
+            if (num != 0) {
+                int[] expPos = expectPos(tileAt(actPos[0], actPos[1]));
+                mdiff += Math.abs(expPos[0] - actPos[0]) + Math.abs(expPos[1] - actPos[1]);
+            }
         }
         return mdiff;
     }
@@ -181,4 +184,10 @@ public class Board implements WorldState {
         return s.toString();
     }
 
+    @Override
+    public int hashCode() {
+        int result = Arrays.deepHashCode(tiles);
+        result = 31 * result + size;
+        return result;
+    }
 }
