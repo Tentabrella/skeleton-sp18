@@ -35,12 +35,16 @@ public class Router {
         Node currNode = new Node(svrtx, null, 0.0, evrtx, g);
         HashSet<Long> marked = new HashSet<>();
 
-        while (currNode.getId() != evrtx) {
-            marked.add(currNode.getId());
-            for (Node child : currNode.strictChildren(marked)) {
-                minPQ.offer(child);
+        try {
+            while (currNode.getId() != evrtx) {
+                marked.add(currNode.getId());
+                for (Node child : currNode.strictChildren(marked)) {
+                    minPQ.offer(child);
+                }
+                currNode = minPQ.remove();
             }
-            currNode = minPQ.remove();
+        } catch (NoSuchElementException noSuchElementException) {
+            return new LinkedList<>();
         }
 
         List<Long> route = readPath(currNode);
