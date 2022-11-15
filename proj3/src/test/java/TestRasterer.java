@@ -1,6 +1,9 @@
 import org.junit.Before;
 import org.junit.Test;
+import pojos.Tile;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -155,4 +158,73 @@ public class TestRasterer {
         return sj.toString();
     }
 
+    @Test
+    public void testAssembleTiles() throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        String[][] render_grid = null;
+        Class<Rasterer> clazz = Rasterer.class;
+        Rasterer instance = clazz.newInstance();
+        Method method = clazz.getDeclaredMethod("assembleTiles", int[].class, Tile.class);
+        method.setAccessible(true);
+
+        render_grid =(String[][]) method.invoke(instance, new Object[]{new int[]{3, 4}, new Tile(2, 0, 1)});
+        assertArrayEquals(new String[]{"d2_x0_y1.png", "d2_x1_y1.png", "d2_x2_y1.png", "d2_x3_y1.png"} , render_grid[0]);
+    }
+
+    @Test
+    public void testCalcDimension() throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        int dimension;
+        Class<Rasterer> clazz = Rasterer.class;
+        Rasterer instance = clazz.newInstance();
+        Method method = clazz.getDeclaredMethod("calcDimension", Map.class);
+        method.setAccessible(true);
+
+        Map<String, Double> param = new HashMap<>();
+        param.put("lrlon", -122.2104604264636);
+        param.put("ullon", -122.30410170759153);
+        param.put("w", 1091.0);
+        param.put("h", 566.0);
+        param.put("lrlat", 37.8318576119893);
+        param.put("ullat", 37.870213571328854);
+        dimension =(int) method.invoke(instance, param);
+        assertEquals(2, dimension);
+    }
+
+    @Test
+    public void testCalcGridSize() throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        int[] gridSize;
+        Class<Rasterer> clazz = Rasterer.class;
+        Rasterer instance = clazz.newInstance();
+        Method method = clazz.getDeclaredMethod("calcGridSize", Tile.class, Map.class);
+        method.setAccessible(true);
+
+        Map<String, Double> param = new HashMap<>();
+        param.put("lrlon", -122.2104604264636);
+        param.put("ullon", -122.30410170759153);
+        param.put("w", 1091.0);
+        param.put("h", 566.0);
+        param.put("lrlat", 37.8318576119893);
+        param.put("ullat", 37.870213571328854);
+        gridSize =(int[]) method.invoke(instance, new Object[]{new Tile(2, 0, 1), param});
+        assertArrayEquals(new int[]{3, 4}, gridSize);
+    }
+
+    @Test
+    public void testFindUlImage() throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        Tile tile;
+        Class<Rasterer> clazz = Rasterer.class;
+        Rasterer instance = clazz.newInstance();
+        Method method = clazz.getDeclaredMethod("findUlImage", int.class, Map.class);
+        method.setAccessible(true);
+
+        Map<String, Double> param = new HashMap<>();
+        param.put("lrlon", -122.2104604264636);
+        param.put("ullon", -122.30410170759153);
+        param.put("w", 1091.0);
+        param.put("h", 566.0);
+        param.put("lrlat", 37.8318576119893);
+        param.put("ullat", 37.870213571328854);
+        int dimension = 2;
+        tile =(Tile) method.invoke(instance, new Object[]{dimension, param});
+        assertEquals(new Tile(2, 0, 1), tile);
+    }
 }

@@ -1,5 +1,4 @@
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +24,40 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-        return null; // FIXME
+        long svrtx = g.closest(stlon, stlat);
+        long evrtx = g.closest(destlon, destlat);
+        List<Long> path = Astar(g, svrtx, evrtx);
+        return path;
+    }
+
+    private static List<Long> Astar(GraphDB g, long svrtx, long evrtx) {
+        PriorityQueue<Node> minPQ = new PriorityQueue<>();
+        Node currNode = new Node(svrtx, null, 0.0, evrtx, g);
+        HashSet<Long> marked = new HashSet<>();
+
+        while (currNode.getId() != evrtx) {
+            marked.add(currNode.getId());
+            for (Node child : currNode.strictChildren(marked)) {
+                minPQ.offer(child);
+            }
+            currNode = minPQ.remove();
+        }
+
+        List<Long> route = readPath(currNode);
+        return route;
+    }
+
+    private static List<Long> readPath(Node currNode) {
+        Stack<Long> stack = new Stack<>();
+        while (currNode != null) {
+            stack.push(currNode.getId());
+            currNode = currNode.getParent();
+        }
+        List<Long> route = new LinkedList<>();
+        while (!stack.isEmpty()) {
+            route.add(stack.pop());
+        }
+        return route;
     }
 
     /**
@@ -37,7 +69,103 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
-        return null; // FIXME
+        List<Move> moves = initMoves(g, route);
+        List<NavigationDirection> result = new LinkedList<>();
+        int movePointer = 1;
+        NavigationDirection startDirection = getStartDirection(moves);
+        result.add(startDirection);
+        NavigationDirection lastDirection = startDirection;
+        Move lastMove = moves.get(0);
+        while (movePointer < moves.size()) {
+            Move currMove = moves.get(movePointer);
+            NavigationDirection currentDirection = calcDirection(lastMove, currMove);
+            if (ifCompressPath(lastDirection, currentDirection)) {
+                lastDirection.distance += currentDirection.distance;
+            } else {
+                result.add(currentDirection);
+                lastDirection = currentDirection;
+            }
+            lastMove = currMove;
+            movePointer++;
+        }
+        return result;
+    }
+
+    private static void printInConsole(List<NavigationDirection> result) {
+        StringBuilder sb = new StringBuilder();
+        int step = 1;
+        for (NavigationDirection d: result) {
+            sb.append(String.format("%d. %s \n", step, d));
+            step += 1;
+        }
+        System.out.println(sb.toString());
+    }
+
+    private static boolean ifCompressPath(NavigationDirection lastDirection, NavigationDirection currentDirection) {
+        return lastDirection.way.equals(currentDirection.way);
+    }
+
+    private static NavigationDirection getStartDirection(List<Move> moves) {
+        NavigationDirection startDirection = new NavigationDirection();
+        startDirection.direction = NavigationDirection.START;
+        startDirection.distance = moves.get(0).calcDistance();
+        startDirection.way = parseWayName(moves.get(0));
+        return startDirection;
+    }
+
+    private static List<Move> initMoves(GraphDB g, List<Long> route) {
+        int slow = 0;
+        int fast = 1;
+        List<Move> moves = new LinkedList<>();
+        while (fast < route.size()) {
+            Move move = new Move(route.get(slow), route.get(fast), g);
+            moves.add(move);
+            slow = fast;
+            fast++;
+        }
+        return moves;
+    }
+
+    private static NavigationDirection calcDirection(Move lastMove, Move currMove) {
+        double lastAngle = lastMove.calcAngle();
+        double currAngle = currMove.calcAngle();
+        double angleDiff = currAngle - lastAngle;
+        NavigationDirection direction = new NavigationDirection();
+        angleDiff = formatAngle(angleDiff);
+        if (angleDiff >= -15 && angleDiff < 15) {
+            direction.direction = NavigationDirection.STRAIGHT;
+        } else if (angleDiff >= -30 && angleDiff < -15) {
+            direction.direction = NavigationDirection.SLIGHT_LEFT;
+        } else if (angleDiff >= 15 && angleDiff < 30) {
+            direction.direction = NavigationDirection.SLIGHT_RIGHT;
+        } else if (angleDiff >= -100 && angleDiff < -30) {
+            direction.direction = NavigationDirection.LEFT;
+        } else if (angleDiff >= 30 && angleDiff < 100) {
+            direction.direction = NavigationDirection.RIGHT;
+        } else if (angleDiff < -100) {
+            direction.direction = NavigationDirection.SHARP_LEFT;
+        } else if (angleDiff > 100) {
+            direction.direction = NavigationDirection.SHARP_RIGHT;
+        }
+        direction.distance = currMove.calcDistance();
+        direction.way = parseWayName(currMove);
+        return direction;
+    }
+
+    private static double formatAngle(double angleDiff) {
+        if (Math.abs(angleDiff) < 180) {
+            return angleDiff;
+        } else if (angleDiff < 0) {
+            return 360 + angleDiff;
+        } else if (angleDiff > 0) {
+            return angleDiff - 360;
+        }
+        return angleDiff;
+    }
+
+    private static String parseWayName(Move move) {
+        String wayName = move.getWayName();
+        return wayName == null ? "" : wayName;
     }
 
 
@@ -158,6 +286,35 @@ public class Router {
         @Override
         public int hashCode() {
             return Objects.hash(direction, way, distance);
+        }
+    }
+
+    public static class Move {
+        final long start;
+        final long end;
+        final GraphDB g;
+
+        public Move(long start, long end, GraphDB g) {
+            this.start = start;
+            this.end = end;
+            this.g = g;
+        }
+
+        public String getWayName() {
+            Set<Long> startWays = g.getVertices().get(start).getWayIds();
+            Set<Long> endWays = g.getVertices().get(end).getWayIds();
+            Set<Long> startWaysCopy = new HashSet<>(startWays);
+            startWaysCopy.retainAll(endWays);
+            long commonWayId = (Long) startWaysCopy.toArray()[0];
+            return g.getWays().get(commonWayId).getName();
+        }
+
+        public double calcAngle() {
+            return g.bearing(start, end);
+        }
+
+        public double calcDistance() {
+            return g.distance(start, end);
         }
     }
 }

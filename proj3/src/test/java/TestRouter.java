@@ -1,6 +1,8 @@
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -9,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class TestRouter {
     private static final String PARAMS_FILE = "path_params.txt";
@@ -36,6 +38,7 @@ public class TestRouter {
         for (int i = 0; i < NUM_TESTS; i++) {
             System.out.println(String.format("Running test: %d", i));
             Map<String, Double> params = testParams.get(i);
+
             List<Long> actual = Router.shortestPath(graph,
                     params.get("start_lon"), params.get("start_lat"),
                     params.get("end_lon"), params.get("end_lat"));
@@ -75,5 +78,21 @@ public class TestRouter {
             expected.add(path);
         }
         return expected;
+    }
+
+    @Test
+    public void testChildren() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Class<Node> clazz = Node.class;
+        Method method = clazz.getDeclaredMethod("children");
+        method.setAccessible(true);
+        List<Node> children =(List<Node>) method.invoke(new Node(4333613086L, null, 0, 267631978, graph));
+        assert(children.stream().mapToLong(Node::getId).anyMatch(value -> value == 394217516L));
+    }
+
+    @Test
+    public void testAstar() {
+        GraphDB db = new GraphDB("../library-sp18/data/tiny-clean.osm.xml");
+        List<Long> longs = Router.shortestPath(db, 0.1, 38.1, 0.6, 38.6);
+        assertArrayEquals(longs.toArray(), new Long[]{11L, 22L, 46L, 66L});
     }
 }
